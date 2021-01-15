@@ -90,10 +90,7 @@ Plug 'iamcco/markdown-preview.vim'
 call plug#end()
 
 
-
-"==============================================================================
 " vim-go 插件
-"==============================================================================
 let g:go_fmt_command = "goimports" " 格式化将默认的 gofmt 替换
 let g:go_autodetect_gopath = 1
 let g:go_list_type = "quickfix"
@@ -113,3 +110,23 @@ let g:godef_split=2
 " 直接通过 go run 执行当前文件
 autocmd FileType go nmap <leader>r :GoRun %<CR>
 
+" NERDTree 插件
+" 打开和关闭NERDTree快捷键
+map <F10> :NERDTreeToggle<CR>
+nmap <M-m> :NERDTreeFind<CR>
+
+" 显示行号
+let NERDTreeShowLineNumbers=1
+" 打开文件时是否显示目录
+let NERDTreeAutoCenter=1
+" 是否显示隐藏文件
+let NERDTreeShowHidden=0
+" 设置宽度
+" let NERDTreeWinSize=31
+" 忽略一下文件的显示
+" let NERDTreeIgnore=['\.pyc','\~$','\.swp']
+" 打开 vim 文件及显示书签列表
+let NERDTreeShowBookmarks=2
+
+" 在终端启动vim时，共享NERDTree
+let g:nerdtree_tabs_open_on_console_startup=1
