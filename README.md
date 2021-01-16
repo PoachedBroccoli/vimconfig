@@ -4,7 +4,7 @@
 vim ~/.vimrc
 ```
 
-##### 插件使用：
+##### 插件管理：
 
 ```http
 https://github.com/junegunn/vim-plug
