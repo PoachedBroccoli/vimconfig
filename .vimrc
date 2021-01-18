@@ -7,23 +7,31 @@ nnoremap <leader>w :w<CR>
 nnoremap <leader>q :q<CR>
 nnoremap <leader>s :wq<CR>
 
+" 括号补全
+inoremap ( ()<ESC>i
+inoremap [ []<LEFT>
+inoremap " ""<ESC>i
+inoremap ' ''<ESC>i
+inoremap { {}<ESC>i
+inoremap {<CR> {<CR>}<ESC>O
+
 set nocompatible    " 关闭兼容模式
 
-"autocmd BufWritePost $MYVIMRC source $MYVIMRC
+"autocmd BufWritePost $MYVIMRC source $MYVIMRC  " 重载配置
 
 set timeout timeoutlen=3000 ttimeoutlen=100
 
 " ========================================================================
 " 显示配置
 " ========================================================================
-set number	" 显示行号，缩写su
-set ruler	" 用于显示当前光标所在的位置的行号和列号(逗号分割)。在最右端显示文本在文件红的相对位置
-set relativenumber	" 显示从当前行数的前后行数
-set cursorline	" 高亮显示当前行，缩写cuc
-set wrap	" 自动换行
-set showcmd	" 显示指令，屏幕最后一行显示(部分)命令
-set showmode	" 在插入、替换和可视模式，最后一行提供消息
-set wildmenu	" 命令补全
+set number         " 显示行号，缩写su
+set ruler          " 用于显示当前光标所在的位置的行号和列号(逗号分割)。在最右端显示文本在文件红的相对位置
+set relativenumber " 显示从当前行数的前后行数
+set cursorline     " 高亮显示当前行，缩写cuc
+set wrap           " 自动换行
+set showcmd        " 显示指令，屏幕最后一行显示(部分)命令
+set showmode       " 在插入、替换和可视模式，最后一行提供消息
+set wildmenu       " 命令补全
 
 " ========================================================================
 " 查找配置
@@ -32,14 +40,17 @@ set hlsearch	" 高亮显示搜索
 set incsearch	" 动态高亮搜索
 set ignorecase  " 不区分大小写搜索
 set smartcase	" 智能大小写搜索，输入大写就会判定当前搜索区分大小写
+set showmatch   " 高亮显示匹配的括号
+set matchtime=1 " 匹配括号高亮的时间（单位是十分之一秒）
 
 " ========================================================================
 " 缩进配置
 " ========================================================================
-set expandtab	" 插入模式下tab都是空格。不使用制表符
-set tabstop=4   " 设定tab长度为4个空格
-set shiftwidth=4	" 普通模式下的<< >>进行缩进的列数为4个空格
-set autoindent	" 继承前一行的缩进方式，适用于多行注释
+set expandtab      " 将制表符扩展为空格：插入模式下tab都是空格。不使用制表符
+set tabstop=4      " 设定tab长度为4个空格
+set shiftwidth=4   " 普通模式下的<< >>进行缩进的列数为4个空格
+set autoindent     " 继承前一行的缩进方式，适用于多行注释
+filetype indent on " 自适应不同语言的智能缩进
 
 " ========================================================================
 " 语法配置
@@ -61,7 +72,10 @@ set termencoding=utf-8	" 用于输出到终端时采用的编码类型
 " ========================================================================
 " 文件类型设置
 " ========================================================================
-filetype on  " 检测文件类型
+filetype on               " 检测文件类型
+filetype indent on        " 针对不同的文件类型采用不同的缩进格式
+" filetype plugin on       " 针对不同的文件类型加载对应的插件
+filetype plugin indent on " 启用自动补全
 
 " ========================================================================
 " 插件开始的位置
@@ -86,9 +100,6 @@ Plug 'Xuyuanp/nerdtree-git-plugin'
 " go get -u github.com/jstemmer/gotags
 Plug 'majutsushi/tagbar'
 
-" 自动补全括号的插件，包括小括号，中括号，以及花括号
-Plug 'jiangmiao/auto-pairs'
-
 " Vim状态栏插件，包括显示行号，列号，文件类型，文件名，以及Git状态
 Plug 'vim-airline/vim-airline'
 
@@ -103,8 +114,9 @@ Plug 'airblade/vim-gitgutter'
 
 
 " 下面两个插件要配合使用，可以自动生成代码块
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
+Plug 'SirVer/ultisnips' " 引擎
+Plug 'honza/vim-snippets'   " 代码块合集，通过添加自定义代码块，提高优先级，可覆盖honza/vim-snippets
+
 
 " 可以在 vim 中使用 tab 补全
 "Plug 'vim-scripts/SuperTab'
@@ -140,7 +152,12 @@ call plug#end()
 " ========================================================================
 xmap ga <Plug>(EasyAlign)
 nmap ga <Plug>(EasyAlign)
-
+let g:easy_align_delimiters = {
+\ '/': {
+\     'pattern':         '//\+\|/\*\|\*/',
+\     'delimiter_align': 'l'
+\   }
+\ }
 
 " ========================================================================
 " NERDTree 插件
@@ -237,6 +254,12 @@ autocmd FileType go nmap <leader>r :GoRun %<CR>
 nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
 nnoremap <leader>gf :YcmCompleter GoToDefinition<CR>
 nnoremap <leader>gg :YcmCompleter GoToDefinitionElseDeclaration<CR>
+
+let g:ycm_key_list_select_completion=['<C-n>', '<Down>']
+let g:ycm_key_list_previous_completion=['<C-p>', '<Up>']
+let g:UltiSnipsExpandTrigger="<Tab>"
+let g:UltiSnipsJumpForwardTrigger="<Tab>"                                           
+let g:UltiSnipsJumpBackwardTrigger="<S-Tab>"
 
 " ========================================================================
 " markdown配置
