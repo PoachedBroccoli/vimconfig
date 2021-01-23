@@ -3,36 +3,68 @@
 " ========================================================================
 let mapleader = ","
 let g:mapleader = ","
+" 保存退出
 nnoremap <leader>w :w<CR>
 map <C-S> :w<CR>
 nnoremap <leader>q :q<CR>
 nnoremap <leader>Q :q!<CR>
-nnoremap <leader>s :wq<CR>
-
+"nnoremap <leader>s :wq<CR>
 
 " 括号补全
-inoremap ( ()<ESC>i
+inoremap ( ()<LEFT>
 inoremap [ []<LEFT>
-inoremap " ""<ESC>i
-inoremap ' ''<ESC>i
-inoremap { {}<ESC>i
-inoremap {<CR> {<CR>}<ESC>O
+inoremap " ""<LEFT>
+inoremap ' ''<LEFT>
+inoremap < <><LEFT>
+inoremap { {<CR>}<ESC>O
 
-"正常模式下插入空行 to/tO
+" 取消高亮
+nnoremap <silent> <BS> :nohlsearch<CR>
+
+" 正常模式下插入空行
 nmap <silent> to :call append('.', '')<CR>
 nmap <silent> tO :call append(line('.')-1, '')<CR>
 
-set nocompatible    " 关闭兼容模式
+" 上移下移，代码中偶尔用到，映射一下方便一点
+if has('win32')
+nnoremap <A-j> :m .+1<CR>==
+nnoremap <A-k> :m .-2<CR>==
+inoremap <A-j> <Esc>:m .+1<CR>==gi
+inoremap <A-k> <Esc>:m .-2<CR>==gi
+vnoremap <A-j> :m '>+1<CR>gv=gv
+vnoremap <A-k> :m '<-2<CR>gv=gv
+"elseif has('unix')
+
+elseif has('mac')
+nnoremap ∆ :m .+1<CR>==
+nnoremap ˚ :m .-2<CR>==
+inoremap ∆ <Esc>:m .+1<CR>==gi
+inoremap ˚ <Esc>:m .-2<CR>==gi
+vnoremap ∆ :m '>+1<CR>gv=gv
+vnoremap ˚ :m '<-2<CR>gv=gv
+endif
 
 "autocmd BufWritePost $MYVIMRC source $MYVIMRC  " 重载配置
 
+set nocompatible    " 关闭兼容模式
+
 set timeout timeoutlen=3000 ttimeoutlen=100
+
+" ========================================================================
+" 样式检查配置
+" ========================================================================
+" 检测函数（检测光标位置处文字的样式名）
+function! <SID>SynStack()
+    echo map(synstack(line('.'),col('.')),'synIDattr(v:val, "name")')
+endfunc
+
+" 绑定检测键位（按键后样式名信息会输出在指令栏的位置）
+nnoremap <leader>ss :call <SID>SynStack()<CR>
 
 " ========================================================================
 " 剪贴板配置
 " ========================================================================
 set clipboard+=unnamed  " 连接 vim 和系统的剪贴板
-
 
 " ========================================================================
 " 显示配置
@@ -51,49 +83,48 @@ set wildmode=longest:list,full
 " ========================================================================
 " 查找配置
 " ========================================================================
-set hlsearch	" 高亮显示搜索
-set incsearch	" 动态高亮搜索
+set hlsearch    " 高亮显示搜索
+set incsearch   " 动态高亮搜索
 set ignorecase  " 不区分大小写搜索
-set smartcase	" 智能大小写搜索，输入大写就会判定当前搜索区分大小写
+set smartcase   " 智能大小写搜索，输入大写就会判定当前搜索区分大小写
 set showmatch   " 高亮显示匹配的括号
 set matchtime=1 " 匹配括号高亮的时间（单位是十分之一秒）
-
 
 " ========================================================================
 " 状态栏配置
 " ========================================================================
-" vim 默认使用单行显示状态，但有些插件需要使用双行展示，不妨直接设成 2
-set laststatus=2
+set laststatus=2    " vim 双行显示状态
 
 " ========================================================================
 " 缩进配置
 " ========================================================================
-set expandtab      " 将制表符扩展为空格：插入模式下tab都是空格。不使用制表符
-set tabstop=4      " 设定tab长度为4个空格
-set shiftwidth=4   " 普通模式下的<< >>进行缩进的列数为4个空格
-set autoindent     " 继承前一行的缩进方式，适用于多行注释
-filetype indent on " 自适应不同语言的智能缩进
+set tabstop=4             " tab字符显示宽度，不修改tab键行为，4个空格作为一个tab
+set softtabstop=4         " 修改tab键行为，不修改tab字符显示宽度，一个tab视为输入4个空格
+set shiftwidth=4          " 换行，普通模式下的<< >>，输入模式下的CTRL+D｜CTRL+T，进行缩进为4个空格
+set expandtab             " 将制表符替换为空格：插入模式下tab都是空格。
+set autoindent            " 继承前一行的缩进方式，适用于多行注释
+filetype plugin indent on " 自适应不同语言的智能缩进
 
-" 修正 vim 删除/退格键行为
-set backspace=eol,start,indent
+" ========================================================================
+" 编辑配置
+" ========================================================================
+
+set backspace=eol,start,indent  " 修正 vim 删除/退格键行为
 
 " ========================================================================
 " 语法配置
 " ========================================================================
-syntax enable	" 语法高亮
-syntax on		" 语法高亮
+syntax enable   " 语法高亮
+syntax on       " 语法高亮
 
 " ========================================================================
 " 编码设置
 " ========================================================================
-set enc=utf-8   " 编码设置，vim内部使用的字符编码，用于缓存的文本、寄存器、Vim 脚本文件
+set enc=utf-8                                              " 编码设置，vim内部使用的字符编码，用于缓存的文本、寄存器、Vim 脚本文件
 " vim 启动的时候会依次使用本配置中的编码对文件内容进行解码
-set fencs=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936 " 编码设置，字符编码的列表，检测文件编码时的备选字符编码列表
-set termencoding=utf-8	" 用于输出到终端时采用的编码类型
-"开启鼠标，那干嘛还用vim。。。
-"set mouse=a
-"set selection=exclusive
-"set selectmode=mouse,key
+set fencs=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936,shift-jis " 编码设置，字符编码的列表，检测文件编码时的备选字符编码列表
+set termencoding=utf-8                                     " 用于输出到终端时采用的编码类型
+set fileformats=unix,dos,mac                               " 换行符
 
 " ========================================================================
 " 文件类型设置
@@ -185,15 +216,15 @@ call plug#end()
 xmap ga <Plug>(EasyAlign)
 nmap ga <Plug>(EasyAlign)
 let g:easy_align_delimiters = {
-\ '/': {
-\     'pattern':         '//\+\|/\*\|\*/',
-\     'delimiter_align': 'l'
-\   },
-\ '#': {
-\     'pattern':         '#',
-\     'delimiter_align': 'l'
-\   }
-\ }
+            \ '/': {
+                \     'pattern':         '//\+\|/\*\|\*/',
+                \     'delimiter_align': 'l'
+                \   },
+                \ '#': {
+                    \     'pattern':         '#',
+                    \     'delimiter_align': 'l'
+                    \   }
+                    \ }
 
 " ========================================================================
 " NERDTree 插件
@@ -220,48 +251,48 @@ let NERDTreeShowBookmarks=2
 let g:nerdtree_tabs_open_on_console_startup=1
 " git文件标注修改
 let g:NERDTreeGitStatusIndicatorMapCustom= {
-    \ "Modified"  : "✹",
-    \ "Staged"    : "✚",
-    \ "Untracked" : "✭",
-    \ "Renamed"   : "➜",
-    \ "Unmerged"  : "═",
-    \ "Deleted"   : "✖",
-    \ "Dirty"     : "✗",
-    \ "Clean"     : "✔︎",
-    \ "Unknown"   : "?"
-    \ }
+            \ "Modified"  : "✹",
+            \ "Staged"    : "✚",
+            \ "Untracked" : "✭",
+            \ "Renamed"   : "➜",
+            \ "Unmerged"  : "═",
+            \ "Deleted"   : "✖",
+            \ "Dirty"     : "✗",
+            \ "Clean"     : "✔︎",
+            \ "Unknown"   : "?"
+            \ }
 
 " ========================================================================
 " tagbar 插件
 " ========================================================================
 nmap <F9> :TagbarToggle<CR>
 let g:tagbar_type_go = {
-	\ 'ctagstype' : 'go',
-	\ 'kinds'     : [
-		\ 'p:package',
-		\ 'i:imports:1',
-		\ 'c:constants',
-		\ 'v:variables',
-		\ 't:types',
-		\ 'n:interfaces',
-		\ 'w:fields',
-		\ 'e:embedded',
-		\ 'm:methods',
-		\ 'r:constructor',
-		\ 'f:functions'
-	\ ],
-	\ 'sro' : '.',
-	\ 'kind2scope' : {
-		\ 't' : 'ctype',
-		\ 'n' : 'ntype'
-	\ },
-	\ 'scope2kind' : {
-		\ 'ctype' : 't',
-		\ 'ntype' : 'n'
-	\ },
-	\ 'ctagsbin'  : 'gotags',
-	\ 'ctagsargs' : '-sort -silent'
-\ }
+            \ 'ctagstype' : 'go',
+            \ 'kinds'     : [
+            \ 'p:package',
+            \ 'i:imports:1',
+            \ 'c:constants',
+            \ 'v:variables',
+            \ 't:types',
+            \ 'n:interfaces',
+            \ 'w:fields',
+            \ 'e:embedded',
+            \ 'm:methods',
+            \ 'r:constructor',
+            \ 'f:functions'
+            \ ],
+            \ 'sro' : '.',
+            \ 'kind2scope' : {
+                \ 't' : 'ctype',
+                \ 'n' : 'ntype'
+                \ },
+                \ 'scope2kind' : {
+                    \ 'ctype' : 't',
+                    \ 'ntype' : 'n'
+                    \ },
+                    \ 'ctagsbin'  : 'gotags',
+                    \ 'ctagsargs' : '-sort -silent'
+                    \ }
 
 set tags=tags;
 
@@ -305,12 +336,12 @@ set t_Co=256
 
 set background=light
 colorscheme PaperColor
+"colorscheme sun
 
 
 " ========================================================================
 " markdown配置
 " ========================================================================
 autocmd BufRead,BufNew *.md,*.mkd,*.markdown set filetype=markdown.mkd
-
 
 
