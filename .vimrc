@@ -3,63 +3,81 @@
 " ========================================================================
 let mapleader = ","
 let g:mapleader = ","
+
+" ctrl c、esc、crtl [ 都不方便
+inoremap jk <esc>
+
 " 保存退出
 nnoremap <leader>w :w<CR>
 map <C-S> :w<CR>
 nnoremap <leader>q :q<CR>
 nnoremap <leader>Q :q!<CR>
-"nnoremap <leader>s :wq<CR>
 
-" 括号补全
-inoremap ( ()<LEFT>
-inoremap [ []<LEFT>
-inoremap " ""<LEFT>
-inoremap ' ''<LEFT>
-inoremap < <><LEFT>
 inoremap { {<CR>}<ESC>O
 
 " 取消高亮
 nnoremap <silent> <BS> :nohlsearch<CR>
 
+" ctrl h没了难受，暂时用x代替。。。
+inoremap <C-x> <BS>
+
+" 移动
+inoremap <C-h> <LEFT>
+inoremap <C-j> <DOWN>
+inoremap <C-k> <UP>
+inoremap <C-l> <RIGHT>
+inoremap <C-a> <Home>
+inoremap <C-e> <End>
+
 " 正常模式下插入空行
-nmap <silent> to :call append('.', '')<CR>
-nmap <silent> tO :call append(line('.')-1, '')<CR>
+nmap <silent> to :call append('.', '')<CR>j
+nmap <silent> tO :call append(line('.')-1, '')<CR>k
 
 " 上移下移，代码中偶尔用到，映射一下方便一点
 if has('win32')
-nnoremap <A-j> :m .+1<CR>==
-nnoremap <A-k> :m .-2<CR>==
-inoremap <A-j> <Esc>:m .+1<CR>==gi
-inoremap <A-k> <Esc>:m .-2<CR>==gi
-vnoremap <A-j> :m '>+1<CR>gv=gv
-vnoremap <A-k> :m '<-2<CR>gv=gv
+    nnoremap <A-j> :m .+1<CR>==
+    nnoremap <A-k> :m .-2<CR>==
+    inoremap <A-j> <Esc>:m .+1<CR>==gi
+    inoremap <A-k> <Esc>:m .-2<CR>==gi
+    vnoremap <A-j> :m '>+1<CR>gv=gv
+    vnoremap <A-k> :m '<-2<CR>gv=gv
 "elseif has('unix')
-
 elseif has('mac')
-nnoremap ∆ :m .+1<CR>==
-nnoremap ˚ :m .-2<CR>==
-inoremap ∆ <Esc>:m .+1<CR>==gi
-inoremap ˚ <Esc>:m .-2<CR>==gi
-vnoremap ∆ :m '>+1<CR>gv=gv
-vnoremap ˚ :m '<-2<CR>gv=gv
+    nnoremap ∆ :m .+1<CR>==
+    nnoremap ˚ :m .-2<CR>==
+    inoremap ∆ <Esc>:m .+1<CR>==gi
+    inoremap ˚ <Esc>:m .-2<CR>==gi
+    vnoremap ∆ :m '>+1<CR>gv=gv
+    vnoremap ˚ :m '<-2<CR>gv=gv
 endif
 
-"autocmd BufWritePost $MYVIMRC source $MYVIMRC  " 重载配置
 
+" ========================================================================
+" 其他
+" ========================================================================
 set nocompatible    " 关闭兼容模式
 
-set timeout timeoutlen=3000 ttimeoutlen=100
+set noswapfile
+
+autocmd BufWritePre * :%s/\s\+$//e " 删除行尾空格和tab
+
+"autocmd BufWritePost $MYVIMRC source $MYVIMRC  " 重载配置
 
 " ========================================================================
 " 样式检查配置
 " ========================================================================
-" 检测函数（检测光标位置处文字的样式名）
+" 获取当前
 function! <SID>SynStack()
     echo map(synstack(line('.'),col('.')),'synIDattr(v:val, "name")')
 endfunc
-
-" 绑定检测键位（按键后样式名信息会输出在指令栏的位置）
 nnoremap <leader>ss :call <SID>SynStack()<CR>
+
+" 获取当前并且父
+function! SynGroup()
+    let l:s = synID(line('.'), col('.'), 1)
+    echo synIDattr(l:s, 'name') . ' -> ' . synIDattr(synIDtrans(l:s), 'name')
+endfun
+nnoremap <leader>sb :call SynGroup()<CR>
 
 " ========================================================================
 " 剪贴板配置
@@ -108,7 +126,6 @@ filetype plugin indent on " 自适应不同语言的智能缩进
 " ========================================================================
 " 编辑配置
 " ========================================================================
-
 set backspace=eol,start,indent  " 修正 vim 删除/退格键行为
 
 " ========================================================================
@@ -135,12 +152,15 @@ filetype indent on        " 针对不同的文件类型采用不同的缩进格�
 filetype plugin indent on " 启用自动补全
 
 " ========================================================================
-" 插件开始的位置
+" 插件配置
 " ========================================================================
 call plug#begin('~/.vim/plugged')
 
 " 可以快速对齐的插件，支持的分隔符: <Space> = : . | & # ,
 Plug 'junegunn/vim-easy-align'
+
+" 方便加对称符号
+Plug 'tpope/vim-surround'
 
 " 用来提供一个导航目录的侧边栏
 Plug 'preservim/nerdtree'
@@ -169,34 +189,11 @@ Plug 'Valloric/YouCompleteMe'
 " 可以在文档中显示 git 信息
 Plug 'airblade/vim-gitgutter'
 
-
 " 下面两个插件要配合使用，可以自动生成代码块
 " 引擎
 Plug 'SirVer/ultisnips'
 " 代码块合集，通过添加自定义代码块，提高优先级，可覆盖honza/vim-snippets
 Plug 'honza/vim-snippets'
-
-" 可以在 vim 中使用 tab 补全
-"Plug 'vim-scripts/SuperTab'
-
-"" 可以在 vim 中自动完成
-""Plug 'Shougo/neocomplete.vim'
-
-
-" 配色方案
-" colorscheme neodark
-Plug 'KeitaNakamura/neodark.vim'
-" colorscheme monokai
-Plug 'crusoexia/vim-monokai'
-" colorscheme github 
-Plug 'acarapetis/vim-colors-github'
-" colorscheme one 
-Plug 'rakr/vim-one'
-" colorscheme paper
-Plug 'NLKNguyen/papercolor-theme'
-" colorscheme hybrid
-Plug 'kristijanhusak/vim-hybrid-material'
-
 
 " go 主要插件
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
@@ -207,7 +204,6 @@ Plug 'dgryski/vim-godef'
 Plug 'iamcco/mathjax-support-for-mkdp'
 Plug 'iamcco/markdown-preview.vim'
 
-"" 插件结束的位置，插件全部放在此行上面
 call plug#end()
 
 " ========================================================================
@@ -217,14 +213,14 @@ xmap ga <Plug>(EasyAlign)
 nmap ga <Plug>(EasyAlign)
 let g:easy_align_delimiters = {
             \ '/': {
-                \     'pattern':         '//\+\|/\*\|\*/',
-                \     'delimiter_align': 'l'
-                \   },
-                \ '#': {
-                    \     'pattern':         '#',
-                    \     'delimiter_align': 'l'
-                    \   }
-                    \ }
+            \     'pattern':         '//\+\|/\*\|\*/',
+            \     'delimiter_align': 'l'
+            \   },
+            \ '#': {
+            \     'pattern':         '#',
+            \     'delimiter_align': 'l'
+            \   }
+            \ }
 
 " ========================================================================
 " NERDTree 插件
@@ -233,6 +229,7 @@ let g:easy_align_delimiters = {
 map <F10> :NERDTreeToggle<CR>
 nmap <C-m> :NERDTreeFind<CR>
 
+" 设置宽度
 let NERDTreeWinSize=35
 " 显示行号
 let NERDTreeShowLineNumbers=1
@@ -241,8 +238,6 @@ let NERDTreeAutoCenter=1
 let NERDTreeAutoCenter=1
 " 是否显示隐藏文件
 let NERDTreeShowHidden=1
-" 设置宽度
-" let NERDTreeWinSize=31
 " 忽略一下文件的显示
 " let NERDTreeIgnore=['\.pyc','\~$','\.swp']
 " 打开 vim 文件及显示书签列表
@@ -326,7 +321,7 @@ nnoremap <leader>gg :YcmCompleter GoToDefinitionElseDeclaration<CR>
 let g:ycm_key_list_select_completion=['<C-n>', '<Down>']
 let g:ycm_key_list_previous_completion=['<C-p>', '<Up>']
 let g:UltiSnipsExpandTrigger="<Tab>"
-let g:UltiSnipsJumpForwardTrigger="<Tab>"                                           
+let g:UltiSnipsJumpForwardTrigger="<Tab>"
 let g:UltiSnipsJumpBackwardTrigger="<S-Tab>"
 
 " ========================================================================
@@ -335,8 +330,7 @@ let g:UltiSnipsJumpBackwardTrigger="<S-Tab>"
 set t_Co=256
 
 set background=light
-colorscheme PaperColor
-"colorscheme sun
+colorscheme heshui
 
 
 " ========================================================================
