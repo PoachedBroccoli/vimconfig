@@ -9,7 +9,6 @@ inoremap jk <esc>
 
 " 保存退出
 nnoremap <leader>w :w<CR>
-map <C-S> :w<CR>
 nnoremap <leader>q :q<CR>
 nnoremap <leader>Q :q!<CR>
 
@@ -21,7 +20,7 @@ nnoremap <silent> <BS> :nohlsearch<CR>
 " ctrl h没了难受，暂时用x代替。。。
 inoremap <C-x> <BS>
 
-" 移动
+" 编辑模式中移动
 inoremap <C-h> <LEFT>
 inoremap <C-j> <DOWN>
 inoremap <C-k> <UP>
@@ -29,7 +28,7 @@ inoremap <C-l> <RIGHT>
 inoremap <C-a> <Home>
 inoremap <C-e> <End>
 
-" 正常模式下插入空行
+" 普通模式下插入空行
 nmap <silent> to :call append('.', '')<CR>j
 nmap <silent> tO :call append(line('.')-1, '')<CR>k
 
@@ -78,6 +77,11 @@ function! SynGroup()
     echo synIDattr(l:s, 'name') . ' -> ' . synIDattr(synIDtrans(l:s), 'name')
 endfun
 nnoremap <leader>sb :call SynGroup()<CR>
+
+" ========================================================================
+" 滚动配置
+" ========================================================================
+set scrolloff=5 " 最下面留5行
 
 " ========================================================================
 " 剪贴板配置
@@ -180,9 +184,6 @@ Plug 'majutsushi/tagbar'
 " Vim状态栏插件，包括显示行号，列号，文件类型，文件名，以及Git状态
 Plug 'vim-airline/vim-airline'
 
-" 有道词典在线翻译
-Plug 'ianva/vim-youdao-translater'
-
 " 代码自动完成，安装完插件还需要额外配置才可以使用
 Plug 'Valloric/YouCompleteMe'
 
@@ -199,6 +200,27 @@ Plug 'honza/vim-snippets'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 " go 中的代码追踪，输入 gd 就可以自动跳转
 Plug 'dgryski/vim-godef'
+
+" html
+Plug 'hail2u/vim-css3-syntax'
+Plug 'gko/vim-coloresque'
+Plug 'tpope/vim-haml'
+Plug 'mattn/emmet-vim'
+
+" javascript
+Plug 'jelera/vim-javascript-syntax'
+
+" typescript
+Plug 'leafgarland/typescript-vim'
+Plug 'HerringtonDarkholme/yats.vim'
+
+" vuejs
+Plug 'posva/vim-vue'
+Plug 'leafOfTree/vim-vue-plugin'
+
+" python
+Plug 'davidhalter/jedi-vim'
+Plug 'raimon49/requirements.txt.vim', {'for': 'requirements'}
 
 " markdown 插件
 Plug 'iamcco/mathjax-support-for-mkdp'
@@ -300,16 +322,60 @@ let g:go_list_type = "quickfix"
 let g:go_version_warning = 1
 let g:go_highlight_types = 1
 let g:go_highlight_fields = 1
+let g:go_highlight_methods = 1
 let g:go_highlight_functions = 1
 let g:go_highlight_function_calls = 1
 let g:go_highlight_operators = 1
-let g:go_highlight_extra_types = 1
-let g:go_highlight_methods = 1
+let g:go_highlight_structs = 1
 let g:go_highlight_generate_tags = 1
+let g:go_highlight_extra_types = 1
 let g:godef_split=2
+
+autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=4 shiftwidth=4 softtabstop=4
 
 "" 直接通过 go run 执行当前文件
 autocmd FileType go nmap <leader>r :GoRun %<CR>
+
+" ========================================================================
+" html
+" ========================================================================
+autocmd Filetype html setlocal ts=2 sw=2 expandtab
+
+" ========================================================================
+" javascript
+" ========================================================================
+let g:javascript_enable_domhtmlcss = 1
+autocmd FileType javascript setl tabstop=4|setl shiftwidth=4|setl expandtab softtabstop=4
+
+" ========================================================================
+" typescript
+" ========================================================================
+let g:yats_host_keyword = 1
+
+" ========================================================================
+" vue
+" ========================================================================
+let g:vue_disable_pre_processors=1
+let g:vim_vue_plugin_load_full_syntax = 1
+
+" ========================================================================
+" python
+" ========================================================================
+autocmd FileType python setlocal expandtab shiftwidth=4 tabstop=8 colorcolumn=79
+      \ formatoptions+=croq softtabstop=4
+      \ cinwords=if,elif,else,for,while,try,except,finally,def,class,with
+
+let g:jedi#popup_on_dot = 0
+let g:jedi#goto_assignments_command = "<leader>g"
+let g:jedi#goto_definitions_command = "<leader>d"
+let g:jedi#documentation_command = "K"
+let g:jedi#usages_command = "<leader>n"
+let g:jedi#rename_command = "<leader>r"
+let g:jedi#show_call_signatures = "0"
+let g:jedi#completions_command = "<C-Space>"
+let g:jedi#smart_auto_mappings = 0
+
+let python_highlight_all = 1
 
 " ========================================================================
 " youcompleteme 插件
@@ -320,6 +386,10 @@ nnoremap <leader>gg :YcmCompleter GoToDefinitionElseDeclaration<CR>
 
 let g:ycm_key_list_select_completion=['<C-n>', '<Down>']
 let g:ycm_key_list_previous_completion=['<C-p>', '<Up>']
+
+" ========================================================================
+" Snip 插件
+" ========================================================================
 let g:UltiSnipsExpandTrigger="<Tab>"
 let g:UltiSnipsJumpForwardTrigger="<Tab>"
 let g:UltiSnipsJumpBackwardTrigger="<S-Tab>"
